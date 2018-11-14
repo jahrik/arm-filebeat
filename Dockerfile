@@ -21,7 +21,7 @@ RUN wget -qO - \
   https://artifacts.elastic.co/GPG-KEY-elasticsearch | \
   apt-key add -
 RUN echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | \
-  sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+  tee -a /etc/apt/sources.list.d/elastic-5.x.list
 RUN apt-get update && apt-get install -y \
   filebeat-${FB_VERSION} \
   && rm -rf /var/lib/apt/lists/*
