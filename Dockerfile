@@ -2,6 +2,7 @@ FROM jahrik/arm-gosu-tini:armv7l
 
 # Add filebeat user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r filebeat && useradd -r -m -g filebeat filebeat
+ENV GOSU_USER filebeat
 
 # Dependencies
 RUN apt-get update && apt-get install -y \
@@ -16,7 +17,7 @@ ENV FB_URL https://artifacts.elastic.co/downloads/beats/filebeat/
 ENV FB_HOME /usr/share/filebeat
 WORKDIR ${FB_HOME}
 RUN wget ${FB_URL}filebeat-${FB_VERSION}-i386.deb && \
-  dpkg -i filebeat-${FB_VERSION}.deb && \
+  dpkg -i filebeat-${FB_VERSION}i386.deb && \
   rm filebeat-${FB_VERSION}.deb
 
 ENV PATH ${FB_HOME}/bin:$PATH
