@@ -18,6 +18,7 @@ ENV FB_HOME /usr/share/filebeat
 WORKDIR ${FB_HOME}
 RUN wget ${FB_URL}filebeat-${FB_VERSION}-linux-x86.tar.gz \
   && tar xzvf filebeat-${FB_VERSION}-linux-x86.tar.gz \
+    -C ${FB_HOME} --strip-components 1 \
   && rm filebeat-${FB_VERSION}-linux-x86.tar.gz
 
 ENV PATH ${FB_HOME}/bin:$PATH
