@@ -4,7 +4,7 @@ TAG := $(shell uname -m)
 
 all: build
 
-build: git
+build:
 	@docker build -t ${IMAGE}:$(TAG) .
 
 push:
