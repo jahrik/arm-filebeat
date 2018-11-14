@@ -1,8 +1,4 @@
-FROM jahrik/arm-gosu-tini:armv7l
-
-# Add filebeat user and group first to make sure their IDs get assigned consistently
-RUN groupadd -r filebeat && useradd -r -m -g filebeat filebeat
-ENV GOSU_USER filebeat
+FROM jahrik/arm-tini:armv7l
 
 # Dependencies
 RUN apt-get update && apt-get install -y \
@@ -21,11 +17,5 @@ RUN wget ${FB_URL}filebeat-${FB_VERSION}-linux-x86.tar.gz \
     -C ${FB_HOME} --strip-components 1 \
   && rm filebeat-${FB_VERSION}-linux-x86.tar.gz
 
-ENV PATH ${FB_HOME}/bin:$PATH
-
-COPY docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
-
-EXPOSE 5000 5044
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["tini", "--"]
 CMD ["filebeat","-e","-c","/etc/filebeat/filebeat.yml"]
