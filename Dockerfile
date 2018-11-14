@@ -6,6 +6,7 @@ ENV GOSU_USER filebeat
 
 # Dependencies
 RUN apt-get update && apt-get install -y \
+  apt-transport-https \
   wget \
   && rm -rf /var/lib/apt/lists/*
 
@@ -16,9 +17,14 @@ ENV FB_VERSION 5.6.12
 ENV FB_URL https://artifacts.elastic.co/downloads/beats/filebeat/
 ENV FB_HOME /usr/share/filebeat
 WORKDIR ${FB_HOME}
-RUN wget ${FB_URL}filebeat-${FB_VERSION}-i386.deb && \
-  dpkg -i filebeat-${FB_VERSION}-i386.deb && \
-  rm filebeat-${FB_VERSION}-i386.deb
+RUN wget -qO - \
+  https://artifacts.elastic.co/GPG-KEY-elasticsearch | \
+  apt-key add -
+RUN echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | \
+  sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+RUN apt-get update && apt-get install -y \
+  filebeat-${FB_VERSION} \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV PATH ${FB_HOME}/bin:$PATH
 
