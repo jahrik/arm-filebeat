@@ -1,6 +1,7 @@
+.EXPORT_ALL_VARIABLES:
 IMAGE = "jahrik/arm-filebeat"
+TAG = latest
 STACK = "elk"
-TAG := $(shell uname -m)
 
 all: build
 

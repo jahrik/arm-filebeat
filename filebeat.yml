@@ -1,9 +1,8 @@
-#==========================  Modules configuration =============================
+#========================== Modules configuration =============================
 filebeat.modules:
 
 #------------------------------- System Module -------------------------------
 - module: system
-  # Syslog
   syslog:
     enabled: true
     var.paths: ["/var/log/syslog*"]
@@ -11,86 +10,27 @@ filebeat.modules:
     enabled: true
     var.paths: ["/var/log/auth.log*"]
 
-#------------------------------- Auditd Module -------------------------------
-# Does not look like Auditd is supported in Alpine linux:
-# https://github.com/linuxkit/linuxkit/issues/52
-- module: auditd
-  log:
-    enabled: false
-
-#========================== Filebeat autodiscover ==============================
-# Autodiscover allows you to detect changes in the system and spawn new modules or inputs as they happen.
-filebeat.autodiscover:
-# Autodiscover docker containers and parse logs
-  providers:
-    - type: docker
-      templates:
-          config:
-            - type: docker
-              containers.ids:
-                - "${data.docker.container.id}"
-
-#=========================== Filebeat inputs ==============================
+#=========================== Filebeat inputs ==================================
+# Container logs (replaces the removed `type: docker` input from 5.x/6.x)
 filebeat.inputs:
-#------------------------------ Docker input --------------------------------
-- type: docker
+- type: filestream
+  id: container-logs
   enabled: true
-  containers.ids:
-    - "*"
   paths:
-    - /var/lib/docker/containers/${data.docker.container.id}/*.log
-  # json.message_key: log
-  # json.add_error_key: true
-  # json.keys_under_root: true
-  exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
-  multiline.pattern: "^\t|^[[:space:]]+(at|...)|^Caused by:"
-  multiline.match: after
+    - /var/lib/docker/containers/*/*.log
+  prospector.scanner.symlinks: true
+  parsers:
+    - container: ~
   processors:
     - add_docker_metadata: ~
-    - add_cloud_metadata: ~
     - add_locale: ~
 
-#------------------------------ Log input --------------------------------
-# - type: log
-#   enabled: true
-#   paths:
-#     - '/var/lib/docker/containers/*/*.log'
-#   json.message_key: log
-#   json.add_error_key: true
-#   json.keys_under_root: true
-#   processors:
-#     - add_docker_metadata: ~
-#     - add_cloud_metadata: ~
-#     - add_locale: ~
-#   multiline.pattern: "^\t|^[[:space:]]+(at|...)|^Caused by:"
-#   multiline.match: after
-#
-# - type: log
-#   enabled: false
-#   paths:
-#     # path to jenkins build logs
-#     - /var/lib/docker/volumes/jenkins_home/_data/jobs/*/builds/*/log
-#   json.message_key: log
-#   json.add_error_key: true
-#   json.keys_under_root: true
-#   multiline.pattern: '^[[:space:]]+|^Caused by:'
-#   multiline.negate: false
-#   multiline.match: after
-
-#========================== Elasticsearch output ===============================
+#========================== Elasticsearch output ==============================
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOST}:9200"]
-  # username: elastic
-  # password: changeme
 
-  # xpack.monitoring:
-  # enabled: true
-  # elasticsearch:
-
-#============================== Dashboards =====================================
+#============================== Dashboards ====================================
 setup.dashboards:
   enabled: true
 setup.kibana:
   host: "${KIBANA_HOST}:5601"
-  # username: elastic
-  # password: changeme
