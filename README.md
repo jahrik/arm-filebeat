@@ -16,14 +16,14 @@ docker run --rm jahrik/arm-filebeat:latest version
 
 ```bash
 docker network create -d overlay elk   # once
-make deploy                            # global service, config via swarm config
+just deploy                            # global service, config via swarm config
 ```
 
 ## Build
 
 ```bash
-make build
-make push
+just build
+just push
 ```
 
 CI: PR builds + version/config checks; merge to main pushes multi-arch (amd64/arm64) to Docker Hub. No armv7: Elastic doesn't publish 32-bit beats images.
