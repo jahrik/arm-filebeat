@@ -5,9 +5,9 @@ Multi-arch Filebeat image: pinned `FROM` over official `docker.elastic.co/beats/
 ## Commands
 
 ```bash
-make build                                  # build jahrik/arm-filebeat:latest
+just build                                  # build jahrik/arm-filebeat:latest
 docker run --rm jahrik/arm-filebeat:latest version
-make deploy                                 # swarm stack deploy (stack: elk)
+just deploy                                 # swarm stack deploy (stack: elk)
 ```
 
 ## CI
